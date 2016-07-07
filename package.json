@@ -1,0 +1,23 @@
+{
+  "name": "imagegami",
+  "version": "1.0.0",
+  "description": "Image Search Abstraction Layer",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/augmt/imagegami.git"
+  },
+  "author": "Hector Garcia",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/augmt/imagegami/issues"
+  },
+  "homepage": "https://github.com/augmt/imagegami#readme",
+  "dependencies": {
+    "express": "4.14.0",
+    "mongodb": "2.1.18"
+  }
+}
