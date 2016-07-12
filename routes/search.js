@@ -4,6 +4,7 @@ const router = require("express").Router();
 const customsearch = require("googleapis").customsearch("v1");
 const moment = require("moment-timezone");
 
+let searchQueries;
 let searchResults;
 
 const getImageData = require("../helpers/get-image-data");
@@ -21,9 +22,21 @@ router.get("/", function (req, res) {
 
     const searchPhrase = req.query.q.trim();
     const offset = req.query.offset || 0;
+    if (!searchQueries) {
+        searchQueries = require("../models/searchqueries")(req.db);
+    }
     if (!searchResults) {
         searchResults = require("../models/searchresults")(req.db);
     }
+
+    const PTZ = moment.tz("America/Los_Angeles");
+    const expireAt = PTZ.startOf("day").hour(24).toDate();
+
+    searchQueries.insertOne({
+        searchPhrase,
+        when: new Date(),
+        expireAt
+    });
 
     searchResults
         .find({
@@ -51,8 +64,6 @@ router.get("/", function (req, res) {
 
                 res.json(docs);
 
-                const PTZ = moment.tz("America/Los_Angeles");
-                const expireAt = PTZ.startOf("day").hour(24).toDate();
                 for (let i = 0; i < docs.length; i++) {
                     docs[i].expireAt = expireAt;
                     docs[i].index = data.queries.request[0].startIndex + i;
