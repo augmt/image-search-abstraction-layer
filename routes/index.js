@@ -4,6 +4,7 @@ const express = require("express");
 const router = express.Router();
 
 router.use("/search", require("./search"));
+router.use("/history", require("./history"));
 
 router.get("/", function (req, res) {
     res.send("<p>Lorem ipsum dolor sit amet &hellip;</p>");
