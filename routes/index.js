@@ -1,13 +1,14 @@
-"use strict";
+'use strict';
 
-const express = require("express");
-const router = express.Router();
+import Router from 'koa-router';
+import getRecentSearches from './get-recent-searches.js';
+import performSearch from './perform-search.js';
 
-router.use("/search", require("./search"));
-router.use("/history", require("./history"));
+const router = module.exports = new Router();
 
-router.get("/", function (req, res) {
-    res.send("<p>Lorem ipsum dolor sit amet &hellip;</p>");
+router.get('/', (ctx) => {
+  ctx.throw(404);
 });
 
-module.exports = router;
+router.get('/recent', getRecentSearches);
+router.get('/search', performSearch);

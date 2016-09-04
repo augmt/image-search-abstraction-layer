@@ -1,10 +1,25 @@
-"use strict";
+'use strict';
 
-const express = require("express");
-const expressMongoDB = require("express-mongo-db");
-const app = express();
+global.fetch = require('node-fetch');
 
-app.use(/\/(search|history)/, expressMongoDB(process.env.MONGO_URL));
-app.use(require("./routes"));
+import Koa from 'koa';
+import cors from 'kcors';
+import json from 'koa-json';
+import router from './routes';
+import dbPromise from './db.js';
 
-app.listen(process.env.PORT);
+const app = module.exports = new Koa();
+
+dbPromise(app).catch((err) => app.emit('error', err)).then(() => {
+  app.use(cors());
+  app.use(json());
+  app.use(async (ctx, next) => {
+    try {
+      await next();
+    } catch (err) {
+      ctx.status = err.status || 500;
+      app.emit('error', err);
+    }
+  });
+  app.use(router.routes());
+});
