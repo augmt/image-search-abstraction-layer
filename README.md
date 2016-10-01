@@ -1,6 +1,7 @@
 # Image Search Abstraction Layer
 
-Search for images on [Unsplash](https://unsplash.com)
+Image Search Abstraction Layer is a REST API which searches for images on
+[Unsplash](https://unsplash.com)
 
 ## Resources
 
