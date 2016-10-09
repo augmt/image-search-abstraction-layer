@@ -7,7 +7,7 @@ import nextDay from 'next-day';
 const router = new Router();
 
 router.get('/search', async (ctx) => {
-  ctx.assert(ctx.query.keyword);
+  ctx.assert(ctx.query.keyword, 404);
 
   const {keyword, offset: page} = ctx.query;
   const res = await unsplash.search.photos(keyword, page);
