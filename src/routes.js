@@ -36,13 +36,11 @@ router.get('/search', async (ctx) => {
 });
 
 router.get('/recent', async (ctx) => {
-  const docs = await ctx.db.collection('recent').find({}).toArray();
-  const recent = docs.map((document) => ({
-    keyword: document.keyword,
-    when: document.when
-  }));
+  const docs = await ctx.db.collection('recent')
+    .find({}, {_id: 0, keyword: 1, when: 1})
+    .toArray();
 
-  ctx.body = {recent: recent.reverse()};
+  ctx.body = {recent: docs.reverse()};
   ctx.type = 'json';
 });
 
