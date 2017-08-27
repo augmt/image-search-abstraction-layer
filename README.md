@@ -1,69 +1,91 @@
 # Image Search Abstraction Layer
 
-Image Search Abstraction Layer is a REST API which searches for images on
-[Unsplash](https://unsplash.com)
+Get image results through the [Unsplash API][1].
 
-## Resources
+[1]: https://unsplash.com/developers
+
+## How it Works
+
+This microservice uses [Monk][2] to store and retrieve objects, [unsplash-js][3]
+and [isomorphic-fetch][4] to fetch results from the Unsplash API, and [Koa][5]
+and [koa-router][6] to serve requests.
+
+[2]: https://github.com/Automattic/monk
+[3]: https://github.com/unsplash/unsplash-js
+[4]: https://github.com/matthew-andrews/isomorphic-fetch
+[5]: http://koajs.com/
+[6]: https://github.com/alexmingoia/koa-router
+
+## How to Use
+
+`app.js` exports a Koa app. Koa apps have an [`app.listen()`][7] method that is
+identical to Node's [http.Server.listen()][8].
+
+Import `app.js` and call `app.listen()` to start up the microservice.
+
+[7]: http://koajs.com/#app-listen-
+[8]: https://nodejs.org/api/http.html#http_server_listen_port_hostname_backlog_callback
+
+### Environment Variables
+
+* `APPLICATION_ID` - required to authenticate requests to the Unsplash API
+* `MONGO_URI` - your Mongo database's connection string
+
+## API Resources
 
 ### GET /search
 
-Get a list of photos and other metadata matching the keyword.
+Get a list of sparse photo metadata for a query.
 
-Example request URLs:
+#### REQUEST
 
-`https://image-search-abstraction-layer.example.com/search?keyword=otter`
+__Sample__: `https://image-search-abstraction-layer.example.com/search?keyword=chickadee`
 
-#### Request
+#### QUERY PARAMETERS
 
-##### QUERY PARAMETERS
+| parameter | type   | default |
+|-----------|--------|---------|
+| keyword   | string |       — |
+| offset    | number |       1 |
+| per_page  | number |      10 |
 
-| parameters | type   | opt/required | default |
-|------------|--------|--------------|---------|
-| keyword    | string | required     |    —    |
-| offset     | number | optional     |    1    |
+#### RESPONSE
 
-#### Responses
+__Status__: 200 - `application/json`
 
-**STATUS 200** - application/json
-
-##### EXAMPLE
+__Response__:
 
     [
       {
-        url: 'https://images.unsplash.com/photo-1431023824486-a9afaaa5838c',
-        snippet: 'Nature',
-        thumbnail: 'https://images.unsplash.com/photo-1431023824486-a9afaaa5838c?ixlib=rb-0.3.5&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&s=84fd9dce50a95a4d4edf32e1ebcf6bd1',
-        context: 'http://unsplash.com/photos/cj4Sd3jLPZ8'
-      },
-      {
-        url: 'https://images.unsplash.com/photo-1463978385905-88978d20502c',
-        snippet: 'Nature',
-        thumbnail: 'https://images.unsplash.com/photo-1463978385905-88978d20502c?ixlib=rb-0.3.5&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&s=6f754732b1f66f4bc5fff6fbe77c7922',
-        context: 'http://unsplash.com/photos/zLEazXBrEPA'
+        "user": {
+          "name": "Paulo Brandao",
+          "small": "https://images.unsplash.com/placeholder-avatars/extra-large.jpg…",
+          "html": "https://unsplash.com/@pbrandao"
+        },
+        "photo": {
+          "small": "https://images.unsplash.com/uploads/141155339325423394b24/03982423…",
+          "html": "https://unsplash.com/photos/YLgTmdb7r1o"
+        }
       }
     ]
 
-**STATUS 404** Returned if keyword is not specified.
+### GET /latest
 
-### GET /recent
+Get a list of the latest queries.
 
-Get a list of the most recently submitted search strings.
+#### REQUEST
 
-Example request URLs:
+__Sample__: `https://image-search-abstraction-layer.example.com/latest`
 
-`https://image-search-abstraction-layer.example.com/recent`
+#### RESPONSE
 
-#### Responses
+__Status__: 200 - `application/json`
 
-**STATUS 200** - application/json
+__Response__:
 
-##### EXAMPLE
-
-    { 
-      recent: [
-        {
-          keyword: 'otter',
-          when: 'Sat, 01 Oct 2016 00:00:00 GMT'
-        }
-      ] 
-    }
+    [
+      {
+        "keyword": "chickadee",
+        "when": "Sat, 01 Oct 2016 00:00:00 GMT"
+      }
+    ]
